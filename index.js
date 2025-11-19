@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const db = require('./config/db');
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +33,13 @@ app.get('/test-db', async (req, res) => {
       message: 'database connction failed',
     });
   }
+});
+
+// ROUTE NEEDED KEY
+app.get('/api/protected-check', authMiddleware, (req, res) => {
+  res.json({
+    message: 'API Key Valid!',
+  });
 });
 
 app.listen(PORT, () => {

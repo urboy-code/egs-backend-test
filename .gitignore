@@ -1,0 +1,8 @@
+#dependecies
+/node_modules
+
+#Environment
+.env
+
+#logs
+*.log

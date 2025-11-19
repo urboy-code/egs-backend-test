@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./config/db');
 const authMiddleware = require('./middleware/authMiddleware');
+const scheduleRoute = require('./routes/scheduleRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -41,6 +42,8 @@ app.get('/api/protected-check', authMiddleware, (req, res) => {
     message: 'API Key Valid!',
   });
 });
+
+app.use('/api/schedules', scheduleRoute);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

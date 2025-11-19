@@ -1,0 +1,16 @@
+services:
+  postgres-egs:
+    image: postgres:15-alpine
+    container_name: egs-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=egs_school
+    ports:
+      - '5435:5432'
+    volumes:
+      - egs_data:/var/lib/postgresql/data
+
+volumes:
+  egs_data:

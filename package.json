@@ -1,0 +1,28 @@
+{
+  "name": "egs-backend-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"node index.js",
+    "dev":"nodemon index.js",
+    "migrate:create":"node-pg-migrate create",
+    "migrate:up":"node-pg-migrate up",
+    "migrate:down":"node-pg-migrate down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^8.0.3",
+    "nodemon": "^3.1.11"
+  }
+}

@@ -4,8 +4,8 @@ Backend service untuk Sistem Jadwal Pelajaran Sekolah, dibangun sebagai bagian d
 
 Aplikasi ini menyediakan RESTful API untuk mengelola jadwal pelajaran, autentikasi pengguna, serta fitur import/export data jadwal menggunakan Excel.
 
-**Live Demo / Base URL:** https://egs-backend-test-production.up.railway.app
-**API Documentation (Swagger):** https://egs-backend-test-production.up.railway.app/api-docs
+* **Live Demo / Base URL:** https://egs-backend-test-production.up.railway.app
+* **API Documentation (Swagger):** https://egs-backend-test-production.up.railway.app/api-docs
 
 ## 🛠 Tech Stack
 

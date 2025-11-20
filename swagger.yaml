@@ -1,0 +1,160 @@
+openapi: 3.0.0
+info:
+  title: EGS School Schedule API
+  description: API Documentation for School Scheduling System
+  version: 1.0.0
+servers:
+  - url: /
+    description: Current Server
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /api/schedules:
+    get:
+      summary: Get all schedules
+      tags: [Schedules]
+      responses:
+        200:
+          description: List of all schedules
+    post:
+      summary: Create a new schedule
+      tags: [Schedules]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_code: { type: string, example: 'XA01' }
+                class_name: { type: string, example: 'X-A' }
+                subject_code: { type: string, example: 'BIO' }
+                teacher_nik: { type: string, example: '20222029' }
+                teacher_name: { type: string, example: 'Najdin Aqmarina, S.Pd.' }
+                date: { type: string, format: date, example: '2025-02-10' }
+                jam_ke: { type: integer, example: 2 }
+                time_start: { type: string, example: '08:40:00' }
+                time_end: { type: string, example: '09:20:00' }
+      responses:
+        201:
+          description: Schedule created
+
+  /api/schedules/{id}:
+    put:
+      summary: Update a schedule
+      tags: [Schedules]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_code: { type: string }
+                class_name: { type: string }
+                subject_code: { type: string }
+                teacher_nik: { type: string }
+                teacher_name: { type: string }
+                date: { type: string }
+                jam_ke: { type: integer }
+                time_start: { type: string }
+                time_end: { type: string }
+      responses:
+        200:
+          description: Schedule updated
+    delete:
+      summary: Delete a schedule
+      tags: [Schedules]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Schedule deleted
+
+  /api/schedules/student:
+    get:
+      summary: Get Student Schedule
+      tags: [Role Specific]
+      parameters:
+        - in: query
+          name: class_code
+          required: true
+          schema: { type: string }
+        - in: query
+          name: date
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        200:
+          description: Success
+
+  /api/schedules/teacher:
+    get:
+      summary: Get Teacher Schedule & Total JP
+      tags: [Role Specific]
+      parameters:
+        - in: query
+          name: teacher_nik
+          required: true
+          schema: { type: string }
+        - in: query
+          name: start_date
+          required: true
+          schema: { type: string, format: date }
+        - in: query
+          name: end_date
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        200:
+          description: Success
+
+  /api/schedules/upload:
+    post:
+      summary: Upload Excel File
+      tags: [Excel]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file_excel:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Upload success
+
+  /api/schedules/export/data:
+    get:
+      summary: Export Recap to Excel
+      tags: [Excel]
+      parameters:
+        - in: query
+          name: start_date
+          required: true
+          schema: { type: string, format: date }
+        - in: query
+          name: end_date
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        200:
+          description: Excel file download

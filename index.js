@@ -4,9 +4,14 @@ const cors = require('cors');
 const db = require('./config/db');
 const authMiddleware = require('./middleware/authMiddleware');
 const scheduleRoute = require('./routes/scheduleRoutes');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 // middleware
 app.use(cors());

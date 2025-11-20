@@ -103,3 +103,144 @@ exports.deleteSchedule = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete schedule!' });
   }
 };
+
+// For Student
+exports.getStudentSchedule = async (req, res) => {
+  try {
+    const { class_code, date } = req.query;
+
+    if (!class_code || !date) {
+      return res.status(400).json({ error: 'class_code and date required!' });
+    }
+
+    const query = `
+      SELECT * FROM schedules
+      WHERE class_code = $1 AND date = $2
+      ORDER BY jam_ke ASC
+    `;
+
+    const result = await db.query(query, [class_code, date]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to get student schedule!' });
+  }
+};
+
+// API for Teacher
+exports.getTeacherSchedule = async (req, res) => {
+  try {
+    const { teacher_nik, start_date, end_date } = req.query;
+
+    if (!teacher_nik || !start_date || !end_date) {
+      return res.status(400).json({ error: 'teacher_nik, start_date, end_date required!' });
+    }
+
+    const query = `
+      SELECT * FROM schedules
+      WHERE teacher_nik = $1 AND date BETWEEN $2 AND $3
+      ORDER BY date ASC, jam_ke ASC
+    `;
+
+    const result = await db.query(query, [teacher_nik, start_date, end_date]);
+    const schedules = result.rows;
+
+    const totalJP = schedules.length;
+    const teacherName = schedules.length > 0 ? schedules[0].teacher_name : 'Teacher Not Found';
+
+    const response = {
+      teacher_name: teacherName,
+      periode: {
+        start_date,
+        end_date,
+      },
+      total_jp: totalJP,
+      jadwal: schedules,
+    };
+
+    res.json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Faild to get teacher schedule!' });
+  }
+};
+
+exports.getRekapJP = async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+
+    if (!start_date || !end_date) {
+      return res.status(400).json({ error: 'Parameter start_date, end_date required' });
+    }
+
+    const query = `
+      SELECT 
+        teacher_nik,
+        teacher_name,
+        class_name,
+        COUNT(id) as jumlah_jp
+      FROM schedules
+      WHERE date BETWEEN $1 AND $2
+      GROUP BY teacher_nik, teacher_name, class_name
+      ORDER BY teacher_name, class_name
+    `;
+
+    const result = await db.query(query, [start_date, end_date]);
+    const rows = result.rows;
+
+    const teachersMap = {};
+
+    rows.forEach((row) => {
+      const nik = row.teacher_nik;
+      const jp = parseInt(row.jumlah_jp);
+
+      if (!teachersMap[nik]) {
+        teachersMap[nik] = {
+          teacher_nik: nik,
+          teacher_name: row.teacher_name,
+          total_jp: 0,
+          detail_map: {},
+          total_kelas: 0,
+        };
+      }
+
+      teachersMap[nik].total_jp += jp;
+
+      if (!teachersMap[nik].detail_map[row.class_name]) {
+        teachersMap[nik].detail_map[row.class_name] = 0;
+        teachersMap[nik].total_kelas++;
+      }
+      teachersMap[nik].detail_map[row.class_name] += jp;
+    });
+
+    const rekapArray = Object.values(teachersMap).map((t) => {
+      const detailArray = Object.keys(t.detail_map).map((className) => ({
+        class_name: className,
+        jumlah_jp: t.detail_map[className],
+      }));
+
+      return {
+        teacher_nik: t.teacher_nik,
+        teacher_name: t.teacher_name,
+        total_jp: t.total_jp,
+        total_kelas: t.total_kelas,
+        detail: detailArray,
+      };
+    });
+
+    // Response JSON Final
+    const response = {
+      periode: {
+        start_date,
+        end_date,
+      },
+      total_pengajar: rekapArray.length,
+      rekap: rekapArray,
+    };
+
+    res.json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed To Get Data!' });
+  }
+};
